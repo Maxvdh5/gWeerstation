@@ -1,2 +1,2 @@
 # SWEN1PRO-G-Project-Weerstation
-gWeerstation
+A simple weather station.
