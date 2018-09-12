@@ -218,7 +218,7 @@ static void MX_I2C1_Init(void)
 {
 
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x0020098E;
+  hi2c1.Init.Timing = 0x2000090E;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -269,36 +269,7 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(15);
-
-    uint16_t address = (0x40<<1);
-    uint16_t cmd = 0x84B8;
-    uint8_t reset = 0xFE;
-    uint8_t data;
-
-    if( HAL_I2C_Master_Transmit(&hi2c1, address, &reset, 1, 1000 ) != HAL_OK)
-    	osDelay(100);
-
-    if( HAL_I2C_Master_Transmit(&hi2c1, address, (uint8_t*)(&cmd), 2, 100000) != HAL_OK)
-    	osDelay(10);
-
-    osDelay(20);
-
-    if( HAL_I2C_Master_Receive(&hi2c1, address, &data, 1, 100000) != HAL_OK )
-    	osDelay(10);
-
-    switch(data)
-    {
-    case 0xFF:
-    	osDelay(100);
-    	break;
-    case 0x20:
-    	osDelay(200);
-    	break;
-    default:
-    	osDelay(1);
-    	break;
-    }
+    osDelay(1);
   }
   /* USER CODE END 5 */ 
 }
