@@ -218,7 +218,7 @@ static void MX_I2C1_Init(void)
 {
 
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x2000090E;
+  hi2c1.Init.Timing = 0x0020098E;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -261,6 +261,14 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE END 4 */
 
+void swapBytes(uint16_t *input)
+{
+	uint8_t msb = (*input & 0xFF00) >> 8;
+	uint8_t lsb = (*input & 0xFF);
+
+	*input = lsb << 8 | msb;
+}
+
 /* StartDefaultTask function */
 void StartDefaultTask(void const * argument)
 {
@@ -269,7 +277,40 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    osDelay(15);
+
+    uint16_t address = (0x40<<1);
+    uint8_t cmdHumidity = 0xE5;
+    uint16_t returnHumidity = 0x00;
+    uint8_t cmdTemperature = 0xE0;
+    uint16_t returnTemperature = 0x00;
+
+
+    if( HAL_I2C_Master_Transmit(&hi2c1, address, (uint8_t*)(&cmdHumidity), 2, 1000) != HAL_OK)
+    	osDelay(10); // enkel voor knakpunt
+
+    osDelay(20);
+
+    if( HAL_I2C_Master_Receive(&hi2c1, address, (uint8_t*)(&returnHumidity), 2, 1000) != HAL_OK )
+    	osDelay(10); // knakpunt
+
+    osDelay(20);
+
+    if( HAL_I2C_Master_Transmit(&hi2c1, address, (uint8_t*)(&cmdTemperature), 2, 1000) != HAL_OK)
+    	osDelay(10); // enkel voor knakpunt
+
+    osDelay(20);
+
+    if( HAL_I2C_Master_Receive(&hi2c1, address, (uint8_t*)(&returnTemperature), 2, 1000) != HAL_OK )
+    	osDelay(10); // knakpunt
+
+    swapBytes(&returnHumidity);
+    swapBytes(&returnTemperature);
+
+    double humidity = ((125*returnHumidity)/65536) - 6;
+    double temperature = ((175.72*returnTemperature)/65536) - 46.85;
+
+    osDelay(100);
   }
   /* USER CODE END 5 */ 
 }
