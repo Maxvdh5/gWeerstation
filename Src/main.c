@@ -307,7 +307,7 @@ void StartDefaultTask(void const * argument)
     swapBytes(&returnHumidity);
     swapBytes(&returnTemperature);
 
-    double humidity = ((125*returnHumidity)/65536) - 6;
+    double humidity = ((125.0*returnHumidity)/65536) - 6;
     double temperature = ((175.72*returnTemperature)/65536) - 46.85;
 
     osDelay(100);
