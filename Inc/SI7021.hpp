@@ -30,8 +30,8 @@ public:
 	virtual ~SI7021();
 	bool init();
 	bool readSensor();
-	uint16_t getHumidity();
-	uint16_t getTemperature();
+	uint16_t * getHumidity();
+	uint16_t * getTemperature();
 };
 
 #endif /* SI7021_HPP_ */

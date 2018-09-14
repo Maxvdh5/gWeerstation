@@ -95,12 +95,12 @@ bool SI7021::readSensor()
 	return true;
 }
 
-uint16_t SI7021::getHumidity()
+uint16_t * SI7021::getHumidity()
 {
-	return rawHumidity;
+	return &rawHumidity;
 }
 
-uint16_t SI7021::getTemperature()
+uint16_t * SI7021::getTemperature()
 {
-	return rawTemperature;
+	return &rawTemperature;
 }

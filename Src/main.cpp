@@ -54,17 +54,19 @@
 /* USER CODE BEGIN Includes */
 #include "config.h"
 #include "SI7021.hpp"
+#include "UART.hpp"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
 
-UART_HandleTypeDef huart1;
+
 
 osThreadId defaultTaskHandle;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 SI7021 si7021;
+UART uart;
 
 osThreadId sensorTaskHandle;
 osThreadId serialTaskHandle;
@@ -73,7 +75,6 @@ osThreadId serialTaskHandle;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_USART1_UART_Init(void);
 void StartDefaultTask(void const * argument);
 void StartSensorTask(void const * argument);
 void StartSerialTask(void const * argument);
@@ -116,7 +117,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -218,27 +218,6 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 3, 0);
 }
 
-/* USART1 init function */
-static void MX_USART1_UART_Init(void)
-{
-
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 38400;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-
-}
-
 /** Pinout Configuration
 */
 static void MX_GPIO_Init(void)
@@ -277,6 +256,7 @@ void StartSensorTask(void const * argument)
 	for(;;)
 	{
 		osDelay(SI7021_INTERVAL);
+
 		if( ! si7021.readSensor() )
 		{
 			// TODO: handle error?
@@ -286,10 +266,17 @@ void StartSensorTask(void const * argument)
 
 void StartSerialTask(void const * argument)
 {
+	if ( !uart.init(38400))
+	{
+		_Error_Handler(__FILE__, __LINE__);
+		return;
+	}
 	for(;;)
 	{
 		osDelay(SERIAL_INTERVAL);
-		volatile uint16_t humi = si7021.getHumidity();
+
+		uart.transmit((uint8_t *)si7021.getHumidity(), 2);
+		uart.transmit((uint8_t *)si7021.getTemperature(), 2);
 	}
 }
 
