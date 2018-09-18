@@ -8,7 +8,7 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#define SI7021_INTERVAL 100
+#define SENSOR_INTERVAL 100
 #define SERIAL_INTERVAL 500
 
 

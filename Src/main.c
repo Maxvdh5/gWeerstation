@@ -53,7 +53,7 @@
 
 /* USER CODE BEGIN Includes */
 #include "config.h"
-#include "SI7021.h"
+#include "sensors.h"
 #include "UART.h"
 /* USER CODE END Includes */
 
@@ -246,16 +246,16 @@ void StartDefaultTask(void const * argument)
 
 void StartSensorTask(void const * argument)
 {
-	if ( initSI7021() != 0)
+	if ( I2C1_Init() != 0)
 	{
 		_Error_Handler(__FILE__, __LINE__);
 		return;
 	}
 	for(;;)
 	{
-		osDelay(SI7021_INTERVAL);
+		osDelay(SENSOR_INTERVAL);
 
-		if( readSensor() != 0 )
+		if( readSensors() != 0 )
 		{
 			// TODO: handle error?
 		}
@@ -275,6 +275,7 @@ void StartSerialTask(void const * argument)
 
 		transmit((uint8_t *)getHumidity(), 2);
 		transmit((uint8_t *)getTemperature(), 2);
+		transmit((uint8_t *)getPressure(), 2);
 	}
 }
 
