@@ -7,6 +7,14 @@
 
 #include "SI7021.h"
 
+I2C_HandleTypeDef hi2c1;
+
+const uint16_t address = (0x40 << 1);
+const uint8_t cmdHumidity = 0xE5;
+const uint8_t cmdTemperature = 0xE0;
+uint16_t rawHumidity;
+uint16_t rawTemperature;
+
 int initSI7021()
 {
 	// MX_I2C1_Init();
