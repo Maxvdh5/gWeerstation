@@ -4,11 +4,11 @@
  *  Created on: 13 Sep 2018
  *      Author: Terence
  */
-#include "UART.hpp"
+#include "UART.h"
 
 UART_HandleTypeDef UartHandle;
 
-bool UART::init(uint16_t _baudRate){
+int init(uint16_t _baudRate){
 	  /*##-1- Configure the UART peripheral ######################################*/
 	  /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
 	  /* UART configured as follows:
@@ -30,13 +30,13 @@ bool UART::init(uint16_t _baudRate){
 
 	  if (HAL_UART_Init(&UartHandle) != HAL_OK)
 	  {
-	    return false;
+	    return 1;
 	  }
 
-	  return true;
+	  return 0;
 }
 
-bool UART::transmit(uint8_t *data, int size){
+int transmit(uint8_t *data, int size){
 
 	uint8_t aTxBuffer[size];
 
@@ -46,8 +46,8 @@ bool UART::transmit(uint8_t *data, int size){
 
 	if( HAL_UART_Transmit(&UartHandle, aTxBuffer, size, 1000) != HAL_OK )
 	{
-		return false;
+		return 1;
 	}
 
-	return true;
+	return 0;
 }

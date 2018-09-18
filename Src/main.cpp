@@ -53,8 +53,8 @@
 
 /* USER CODE BEGIN Includes */
 #include "config.h"
-#include "SI7021.hpp"
-#include "UART.hpp"
+#include "SI7021.h"
+#include "UART.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -65,8 +65,6 @@ osThreadId defaultTaskHandle;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-SI7021 si7021;
-UART uart;
 
 osThreadId sensorTaskHandle;
 osThreadId serialTaskHandle;
@@ -248,7 +246,7 @@ void StartDefaultTask(void const * argument)
 
 void StartSensorTask(void const * argument)
 {
-	if ( !si7021.init())
+	if ( initSI7021() != 0)
 	{
 		_Error_Handler(__FILE__, __LINE__);
 		return;
@@ -257,7 +255,7 @@ void StartSensorTask(void const * argument)
 	{
 		osDelay(SI7021_INTERVAL);
 
-		if( ! si7021.readSensor() )
+		if( readSensor() != 0 )
 		{
 			// TODO: handle error?
 		}
@@ -266,7 +264,7 @@ void StartSensorTask(void const * argument)
 
 void StartSerialTask(void const * argument)
 {
-	if ( !uart.init(38400))
+	if ( initUART(38400) != 0)
 	{
 		_Error_Handler(__FILE__, __LINE__);
 		return;
@@ -275,8 +273,8 @@ void StartSerialTask(void const * argument)
 	{
 		osDelay(SERIAL_INTERVAL);
 
-		uart.transmit((uint8_t *)si7021.getHumidity(), 2);
-		uart.transmit((uint8_t *)si7021.getTemperature(), 2);
+		transmit((uint8_t *)getHumidity(), 2);
+		transmit((uint8_t *)getTemperature(), 2);
 	}
 }
 

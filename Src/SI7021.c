@@ -5,20 +5,9 @@
  *      Author: niels
  */
 
-#include <SI7021.hpp>
+#include "SI7021.h"
 
-SI7021::SI7021()
-{
-	// TODO Auto-generated constructor stub
-
-}
-
-SI7021::~SI7021()
-{
-	// TODO Auto-generated destructor stub
-}
-
-bool SI7021::init()
+int initSI7021()
 {
 	// MX_I2C1_Init();
 
@@ -33,30 +22,30 @@ bool SI7021::init()
 	hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
 	if (HAL_I2C_Init(&hi2c1) != HAL_OK)
 	{
-		return false;
+		return 1;
 	}
 
 	/**Configure Analogue filter
 	 */
 	if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
 	{
-		return false;
+		return 1;
 	}
 
 	/**Configure Digital filter
 	 */
 	if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
 	{
-		return false;
+		return 1;
 	}
 
-	return true; // I2C initialized
+	return 0; // I2C initialized
 }
 
 /* Helper function to swap the order of the bytes
  * in SI7021's return values
  */
-void SI7021::swapBytes(uint16_t *input, uint16_t *output)
+void swapBytes(uint16_t *input, uint16_t *output)
 {
 	uint8_t msb = (*input & 0xFF00) >> 8;
 	uint8_t lsb = (*input & 0xFF);
@@ -64,18 +53,18 @@ void SI7021::swapBytes(uint16_t *input, uint16_t *output)
 	*output = lsb << 8 | msb;
 }
 
-bool SI7021::readSensor()
+int readSensor()
 {
 	uint16_t humidity, temperature;
 
 	// Request humidity reading
 	if (HAL_I2C_Master_Transmit(&hi2c1, address, (uint8_t*) (&cmdHumidity), 2,
 			1000) != HAL_OK)
-		return (false);
+		return (1);
 
 	// Receive humidity reading
 	if (HAL_I2C_Master_Receive(&hi2c1, address, (uint8_t *)&humidity, 2, 1000) != HAL_OK)
-		return (false);
+		return (1);
 
 	// Humidity was succesfully read: copy the value
 	swapBytes(&humidity, &rawHumidity);
@@ -83,24 +72,24 @@ bool SI7021::readSensor()
 	// Request temperature reading
 	if (HAL_I2C_Master_Transmit(&hi2c1, address, (uint8_t*) (&cmdTemperature),
 			2, 1000) != HAL_OK)
-		return (false);
+		return (1);
 
 	// Receive temperature reading
 	if (HAL_I2C_Master_Receive(&hi2c1, address, (uint8_t *)&temperature, 2, 1000) != HAL_OK)
-		return (false);
+		return (1);
 
 	// Temperature reading was succesfull: copy value
 	swapBytes(&temperature, &rawTemperature);
 
-	return true;
+	return 0;
 }
 
-uint16_t * SI7021::getHumidity()
+uint16_t * getHumidity()
 {
 	return &rawHumidity;
 }
 
-uint16_t * SI7021::getTemperature()
+uint16_t * getTemperature()
 {
 	return &rawTemperature;
 }
