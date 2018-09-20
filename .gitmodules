@@ -1,4 +1,3 @@
 [submodule "GUI"]
 	path = GUI
 	url = https://github.com/pgils/gWeerstation-GUI.git
-  branch = development
