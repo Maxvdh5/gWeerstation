@@ -8,7 +8,7 @@
 
 UART_HandleTypeDef UartHandle;
 
-int initUART(uint16_t _baudRate){
+int initUART(uint32_t _baudRate){
 	  /*##-1- Configure the UART peripheral ######################################*/
 	  /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
 	  /* UART configured as follows:
