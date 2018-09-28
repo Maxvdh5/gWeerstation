@@ -11,9 +11,8 @@
 class UART{
 
 public:
-	void init(uint16_t _baudRate);
+	void init(uint32_t _baudRate);
 	void transmit(uint8_t *data, int size);
-
 private:
 
 };

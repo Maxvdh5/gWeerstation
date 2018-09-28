@@ -7,10 +7,9 @@
 #include "UART.hpp"
 #include "main.h"
 #include <stdlib.h>
-
 UART_HandleTypeDef UartHandle;
 
-void UART::init(uint16_t _baudRate){
+void UART::init(uint32_t _baudRate){
 	  /*##-1- Configure the UART peripheral ######################################*/
 	  /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
 	  /* UART configured as follows:
@@ -30,7 +29,6 @@ void UART::init(uint16_t _baudRate){
 	  UartHandle.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 
 	  HAL_UART_Init(&UartHandle);
-
 }
 
 void UART::transmit(uint8_t *data, int size){
@@ -40,6 +38,7 @@ void UART::transmit(uint8_t *data, int size){
 	for(int _size = size-1; _size>=0; _size--){
 		aTxBuffer[_size] = data[_size];
 	}
+
 
 	HAL_UART_Transmit_DMA(&UartHandle, (uint8_t*) aTxBuffer, size);
 }
