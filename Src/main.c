@@ -50,32 +50,25 @@
 #include "main.h"
 #include "stm32f0xx_hal.h"
 #include "cmsis_os.h"
+#include "i2c.h"
+#include "rtc.h"
+#include "usart.h"
+#include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-#include "config.h"
-#include "sensors.h"
-#include "UART.h"
+
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
 
-
-
-osThreadId defaultTaskHandle;
-
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 
-osThreadId sensorTaskHandle;
-osThreadId serialTaskHandle;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-void StartDefaultTask(void const * argument);
-void StartSensorTask(void const * argument);
-void StartSerialTask(void const * argument);
+void MX_FREERTOS_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -115,32 +108,15 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_RTC_Init();
+  MX_I2C1_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
-  /* Create the thread(s) */
-  /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityIdle, 0, 128);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
-
-
-  /* USER CODE BEGIN RTOS_THREADS */
-  /* definition and creation of sensorTask */
-  osThreadDef(sensorTask, StartSensorTask, osPriorityHigh, 0 ,128);
-  sensorTaskHandle = osThreadCreate(osThread(sensorTask), NULL);
-
-  /* definition and creation of serialTask */
-  osThreadDef(serialTask, StartSerialTask, osPriorityNormal, 0 , 128);
-  serialTaskHandle = osThreadCreate(osThread(serialTask), NULL);
-
-
-  /* USER CODE END RTOS_THREADS */
-
-  /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
-  /* USER CODE END RTOS_QUEUES */
- 
+  /* Call init function for freertos objects (in freertos.c) */
+  MX_FREERTOS_Init();
 
   /* Start scheduler */
   osKernelStart();
@@ -172,9 +148,16 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
   RCC_PeriphCLKInitTypeDef PeriphClkInit;
 
+    /**Configure LSE Drive Capability 
+    */
+  HAL_PWR_EnableBkUpAccess();
+
+  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_HIGH);
+
     /**Initializes the CPU, AHB and APB busses clocks 
     */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSE;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
@@ -196,9 +179,11 @@ void SystemClock_Config(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_I2C1;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_I2C1
+                              |RCC_PERIPHCLK_RTC;
   PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_HSI;
+  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
@@ -216,68 +201,9 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 3, 0);
 }
 
-/** Pinout Configuration
-*/
-static void MX_GPIO_Init(void)
-{
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-
-}
-
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
-
-/* StartDefaultTask function */
-void StartDefaultTask(void const * argument)
-{
-
-  /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END 5 */ 
-}
-
-void StartSensorTask(void const * argument)
-{
-	if ( I2C1_Init() != 0)
-	{
-		_Error_Handler(__FILE__, __LINE__);
-		return;
-	}
-	for(;;)
-	{
-		osDelay(SENSOR_INTERVAL);
-
-		if( readSensors() != 0 )
-		{
-			// TODO: handle error?
-		}
-	}
-}
-
-void StartSerialTask(void const * argument)
-{
-	if ( initUART(38400) != 0)
-	{
-		_Error_Handler(__FILE__, __LINE__);
-		return;
-	}
-	for(;;)
-	{
-		osDelay(SERIAL_INTERVAL);
-
-		transmit((uint8_t *)getHumidity(), 2);
-		transmit((uint8_t *)getTemperature(), 2);
-		transmit((uint8_t *)getPressure(), 2);
-	}
-}
 
 /**
   * @brief  Period elapsed callback in non blocking mode
