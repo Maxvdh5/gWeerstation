@@ -56,7 +56,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "rtc.h"
+#include "stm32f0xx_hal.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -156,7 +157,16 @@ void StartDefaultTask(void const * argument)
     {
         osDelay(1);
     }
-    _Error_Handler(__FILE__, __LINE__);
+
+    MX_RTC_Init();
+
+    // Manually clear the WakeUp flag, since the IRQ handler,
+    // which clears it, hasn't been called yet.
+    __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+
+    // Enter STANDBY
+    HAL_PWR_EnterSTANDBYMode();
+
     for (;;)
     {
         osDelay(1);
