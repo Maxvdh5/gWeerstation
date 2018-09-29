@@ -186,6 +186,7 @@ void StartSensorTask(void const * argument)
     /* USER CODE BEGIN StartSensorTask */
     osDelay(5000);
     sensorTaskDone = 1;
+    osThreadTerminate(sensorTaskHandle);
     /* Infinite loop */
     for (;;)
     {
@@ -206,6 +207,7 @@ void StartWifiTask(void const * argument)
     /* USER CODE BEGIN StartWifiTask */
     osDelay(10000);
     wifiTaskDone = 1;
+    osThreadTerminate(wifiTaskHandle);
     /* Infinite loop */
     for (;;)
     {
