@@ -56,6 +56,7 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
+#include "stm32f0xx_nucleo.h"
 
 /* USER CODE END Includes */
 
@@ -96,6 +97,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+  BSP_LED_Init(LED2);
 
   /* USER CODE END Init */
 
@@ -238,6 +240,8 @@ void _Error_Handler(char *file, int line)
   /* User can add his own implementation to report the HAL error return state */
   while(1)
   {
+	  BSP_LED_Toggle(LED2);
+	  osDelay(250);
   }
   /* USER CODE END Error_Handler_Debug */
 }
