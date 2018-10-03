@@ -11,6 +11,4 @@
 #define SENSOR_INTERVAL 100
 #define SERIAL_INTERVAL 500
 
-
-
 #endif /* CONFIG_H_ */
