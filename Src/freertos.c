@@ -58,6 +58,7 @@
 /* USER CODE BEGIN Includes */
 #include "rtc.h"
 #include "stm32f0xx_hal.h"
+#include "stm32f0xx_nucleo.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -151,6 +152,7 @@ void MX_FREERTOS_Init(void)
 void StartDefaultTask(void const * argument)
 {
 
+    BSP_LED_On(LED2);
     /* USER CODE BEGIN StartDefaultTask */
     /* Infinite loop */
     while (!sensorTaskDone || !wifiTaskDone)
