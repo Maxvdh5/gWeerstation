@@ -10,6 +10,12 @@
 #include "stm32f0xx_hal.h"
 
 int initUART(uint32_t _baudRate);
-int transmit(uint8_t *data, int size);
+int transmit(char *data);
+void initGPIO();
+void ESPwakeUp();
+void ESPsleep();
+void recieve();
+void POST_SENSOR_DATA(uint8_t humidity, uint8_t temperature, uint8_t pressure, char *password);
+void initESP();
 
 #endif /* UART_H_ */
