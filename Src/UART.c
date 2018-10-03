@@ -14,6 +14,7 @@
 #define RCC_AHBENR	(*(unsigned int *)(0x40021000 + 0x14))
 
 UART_HandleTypeDef UartHandle;
+__IO ITStatus UARTReady = RESET;
 
 void initGPIO() {
 	RCC_AHBENR |= (1 << 17); 		     // Enable clock for GPIO port A
@@ -76,28 +77,40 @@ void POST_SENSOR_DATA(uint8_t humidity, uint8_t temperature, uint8_t pressure, c
 
 	sprintf(ATCIPSEND,"AT+CIPSEND=%d\r\n",size-100);
 	transmit(ATCIPSEND);
-	osDelay(1000);
 	sprintf(postRequest,"POST /insert.php HTTP/1.1\r\nHost: pellevangils.nl\r\nAccept: */*\r\nContent-Length: %d\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\ntemperature=%d&humidity=%d&pressure=%d&password=%s\r\n",contentValue,1,2,3,"x0tFeeIUSPIVk50F");
 	transmit(postRequest);
+	// SEND OK
 }
 
 void initESP() {
 	transmit("AT+CWQAP\r\n");
-	osDelay(1000);
+	// OK
 	transmit("AT+CIPMODE=0\r\n");
-	osDelay(1000);
+	// OK
 	transmit("AT+CIPMUX=0\r\n");
-	osDelay(1000);
-	transmit("AT+CWJAP=\"gws\",\"gweerstation\"\r\n");//connect to wifi wait a long time
-	osDelay(10000);
-	transmit("AT+CIPSTART=\"TCP\",\"www.pellevangils.nl\",80\r\n");
+	// OK
+	transmit("AT+CWJAP_CUR=\"gws\",\"gweerstation\"\r\n");//connect to wifi wait a long time
+	// OK
+	transmit("AT+CIPSTART=\"TCP\",\"pellevangils.nl\",80\r\n");
+	// OK
 }
 
 int transmit(char *data) {
-	if (HAL_UART_Transmit(&UartHandle, (uint8_t*)data, strlen(data), 1000) != HAL_OK) {
+	if (HAL_UART_Transmit_IT(&UartHandle, (uint8_t*)data, strlen(data)) != HAL_OK) {
 
 		return 1;
 	}
 
+	while (UARTReady != SET)
+	{
+	    osDelay(1);
+	}
+	UARTReady = RESET;
+
 	return 0;
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    UARTReady = SET;
 }
