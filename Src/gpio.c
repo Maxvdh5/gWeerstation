@@ -78,10 +78,26 @@ void MX_GPIO_Init(void)
     __HAL_RCC_GPIOB_CLK_ENABLE()
     ;
 
+    /*
+     * The ESP8266 WiFi module is 'awoken' from Deep Sleep mode
+     * by pulsing it's RST pin low.
+     * The GPIO_PIN_4 is in RESET/low state on initilization
+     * It is then SET to allow the module to power on.
+     */
+    GPIO_InitTypeDef  resetPinInitStruct;
+
+    resetPinInitStruct.Pin = GPIO_PIN_4;
+    resetPinInitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    resetPinInitStruct.Pull = GPIO_PULLUP;
+    resetPinInitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+
+    HAL_GPIO_Init(GPIOB, &resetPinInitStruct);
+
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+
 }
 
 /* USER CODE BEGIN 2 */
-
 /* USER CODE END 2 */
 
 /**
