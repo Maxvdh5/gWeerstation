@@ -57,6 +57,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "rtc.h"
+#include "sensors.h"
 #include "UART.h"
 #include "stm32f0xx_hal.h"
 /* USER CODE END Includes */
@@ -185,7 +186,7 @@ void StartDefaultTask(void const * argument)
 void StartSensorTask(void const * argument)
 {
     /* USER CODE BEGIN StartSensorTask */
-    osDelay(5000);
+    readSensors();
     sensorTaskDone = 1;
     osThreadTerminate(sensorTaskHandle);
     /* Infinite loop */
@@ -206,8 +207,23 @@ void StartSensorTask(void const * argument)
 void StartWifiTask(void const * argument)
 {
     /* USER CODE BEGIN StartWifiTask */
-    initESP();
-    POST_SENSOR_DATA(4,5,6,"x0tFeeIUSPIVk50F");
+    if( initESP() != 0 ) // Init WiFi connection
+    {
+    	// Handle error?
+    }
+    else
+    {
+    	while( !sensorTaskDone ) // Wait for sensors to be read
+    	{
+    		osDelay(1);
+    	}
+    	// send latest sensor data to the cloud storage
+    	if( POST_SENSOR_DATA(getTemperature() ,getHumidity() ,getPressure() ,"x0tFeeIUSPIVk50F") != 0 )
+    	{
+    		// Handle error?
+    	}
+    }
+
     wifiTaskDone = 1;
     osThreadTerminate(wifiTaskHandle);
     /* Infinite loop */
