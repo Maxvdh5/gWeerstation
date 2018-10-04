@@ -14,7 +14,7 @@ void initGPIO();
 void ESPwakeUp();
 void ESPsleep();
 void recieve();
-void POST_SENSOR_DATA(uint8_t humidity, uint8_t temperature, uint8_t pressure, char *password);
-void initESP();
+int POST_SENSOR_DATA(uint8_t humidity, uint8_t temperature, uint8_t pressure, char *password);
+int initESP();
 
 #endif /* UART_H_ */

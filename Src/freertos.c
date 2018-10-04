@@ -57,6 +57,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "rtc.h"
+#include "UART.h"
 #include "stm32f0xx_hal.h"
 /* USER CODE END Includes */
 
@@ -205,7 +206,8 @@ void StartSensorTask(void const * argument)
 void StartWifiTask(void const * argument)
 {
     /* USER CODE BEGIN StartWifiTask */
-    osDelay(10000);
+    initESP();
+    POST_SENSOR_DATA(4,5,6,"x0tFeeIUSPIVk50F");
     wifiTaskDone = 1;
     osThreadTerminate(wifiTaskHandle);
     /* Infinite loop */
