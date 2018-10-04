@@ -92,6 +92,7 @@ void MX_GPIO_Init(void)
     resetPinInitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 
     HAL_GPIO_Init(GPIOB, &resetPinInitStruct);
+    HAL_Delay(10); // allow some time for reset
 
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
 
