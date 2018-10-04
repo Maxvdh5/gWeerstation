@@ -10,7 +10,9 @@
 uint16_t rawHumidity = 0x0000;
 uint16_t rawTemperature = 0x0000;
 uint16_t rawPressure = 0x0000;
-
+/*
+*This function initialise the I2C.
+*/
 int I2C1_Init()
 {
 
@@ -76,6 +78,7 @@ int readSensor(uint8_t address, uint8_t command, uint16_t *data)
 	return 0;
 }
 
+//This function reads the sensor data and puts it in a buffer this buffer
 int readSensors()
 {
 	readSensor(SI7021_ADDRESS, CMD_SI7021_HUMIDITY, &rawHumidity);
@@ -84,7 +87,7 @@ int readSensors()
 
 	return 0;
 }
-
+//The the buffer filled in the function readSensor is returned in the functions getHumidity, getTemperature and getPressure
 uint16_t * getHumidity()
 {
 	return &rawHumidity;
