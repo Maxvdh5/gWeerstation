@@ -3,15 +3,17 @@
  *
  *  Created on: Sep 18, 2018
  *      Author: pollop
+ *
+ *      TODO: sensor data struct
  */
 
 #include "sensors.h"
 #include "i2c.h"
 #include "cmsis_os.h"
 
-uint16_t rawHumidity = 0x0000;
-uint16_t rawTemperature = 0x0000;
-uint16_t rawPressure = 0x0000;
+uint16_t humidity = 0x0000;
+uint16_t temperature = 0x0000;
+uint16_t pressure = 0x0000;
 
 
 /* Helper function to swap the order of the bytes
@@ -76,10 +78,21 @@ int readBMPSensor(uint8_t address, uint8_t command, uint16_t *data)
     return 0;
 }
 
+/*
+ * Read out all the available sensors
+ * calculations are as specified in the sensor's datasheets.
+ * results are multiplied by 10 so we can send integer values to the database
+ */
 int readSensors()
 {
+    uint16_t rawHumidity, rawTemperature, rawPressure;
+
     readSensor(SI7021_ADDRESS, CMD_SI7021_HUMIDITY, &rawHumidity);
+    humidity  = (((125.0 * rawHumidity) / 65536) - 6) * 10;
+
     readSensor(SI7021_ADDRESS, CMD_SI7021_TEMPERATURE, &rawTemperature);
+    temperature = (((175.72 * rawTemperature)/65536) - 46.85) * 10;
+
     readBMPSensor(BMP180_ADDRESS, CMD_BMP180_PRESSURE, &rawPressure);
 
     return 0;
@@ -87,15 +100,15 @@ int readSensors()
 
 uint16_t * getHumidity()
 {
-    return &rawHumidity;
+    return &humidity;
 }
 
 uint16_t * getTemperature()
 {
-    return &rawTemperature;
+    return &temperature;
 }
 
 uint16_t * getPressure()
 {
-    return &rawPressure;
+    return &pressure;
 }
