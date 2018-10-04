@@ -9,7 +9,6 @@
 
 #include "stm32f0xx_hal.h"
 
-int initUART(uint32_t _baudRate);
 int transmit(char *data);
 void initGPIO();
 void ESPwakeUp();
