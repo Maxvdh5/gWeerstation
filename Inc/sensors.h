@@ -17,10 +17,6 @@
 #define BMP180_ADDRESS 0x77
 #define CMD_BMP180_PRESSURE 0xF7
 
-I2C_HandleTypeDef hi2c1;
-
-int I2C1_Init();
-int readSensor(uint8_t address, uint8_t command, uint16_t *data);
 int readSensors();
 uint16_t * getHumidity();
 uint16_t * getTemperature();
