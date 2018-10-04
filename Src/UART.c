@@ -41,6 +41,23 @@ int POST_SENSOR_DATA(uint16_t *humidity, uint16_t *temperature, uint16_t *pressu
 	{
 		return 1;
 	}
+	osDelay(1000);
+
+	// 3: close connection (if any)
+	//sprintf(cipCmdBuf, "AT+CIPCLOSE\r\n");
+	if( transmit("AT+CIPCLOSE\r\n") != 0 )
+	{
+		return 1;
+	}
+	osDelay(1000);
+
+	// 4: Send a Deep Sleep request
+	// TODO: variable/configurable sleep
+	if( transmit("AT+GSLP=120\r\n") != 0 )
+	{
+		return 1;
+	}
+
 
 	return 0;
 }
