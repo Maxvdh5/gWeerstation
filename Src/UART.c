@@ -65,9 +65,9 @@ void recieve() {
 
 void POST_SENSOR_DATA(uint8_t humidity, uint8_t temperature, uint8_t pressure, char *password) {
 
-	char dataString[40];
-	sprintf(dataString,"%d%d%d%s",humidity,temperature,pressure,(char*)password);
-	uint8_t dataSize = strlen((char*)dataString);
+	char dataString[40];								//
+	sprintf(dataString,"%d%d%d%s",humidity,temperature,pressure,(char*)password);   //Calculate variable size for content value and size of the full post
+	uint8_t dataSize = strlen((char*)dataString);					//
 
 	char postRequest[200];
 	uint8_t size = 176 + dataSize//176 is the size of postrequest without any values given to the 4 variabales
@@ -82,19 +82,19 @@ void POST_SENSOR_DATA(uint8_t humidity, uint8_t temperature, uint8_t pressure, c
 }
 
 void initESP() {
-	transmit("AT+CWQAP\r\n");
+	transmit("AT+CWQAP\r\n");//disconnect from wifi network
 	osDelay(1000);
-	transmit("AT+CIPMODE=0\r\n");
+	transmit("AT+CIPMODE=0\r\n");//transfer mode normal
 	osDelay(1000);
-	transmit("AT+CIPMUX=0\r\n");
+	transmit("AT+CIPMUX=0\r\n");//mode for one connection
 	osDelay(1000);
 	transmit("AT+CWJAP=\"gws\",\"gweerstation\"\r\n");//connect to wifi wait a long time
 	osDelay(10000);
-	transmit("AT+CIPSTART=\"TCP\",\"www.pellevangils.nl\",80\r\n");
+	transmit("AT+CIPSTART=\"TCP\",\"www.pellevangils.nl\",80\r\n");//Establish TCP connection with pellevangils.nl
 }
 
 int transmit(char *data) {
-	if (HAL_UART_Transmit(&UartHandle, (uint8_t*)data, strlen(data), 1000) != HAL_OK) {
+	if (HAL_UART_Transmit(&UartHandle, (uint8_t*)data, strlen(data), 1000) != HAL_OK) {//Transmit data to pin D8
 
 		return 1;
 	}
