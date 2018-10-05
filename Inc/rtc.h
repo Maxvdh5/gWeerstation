@@ -65,7 +65,7 @@ extern "C"
 extern RTC_HandleTypeDef hrtc;
 
 /* USER CODE BEGIN Private defines */
-#define RTC_ALARM_INTERVAL 0x45
+#define RTC_ALARM_INTERVAL 0x40
 /* USER CODE END Private defines */
 
 extern void _Error_Handler(char *, int);
