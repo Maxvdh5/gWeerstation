@@ -10,12 +10,10 @@
 
 #include "stm32f0xx_hal.h"
 
+#define BMP180_ADDRESS 0xEE
 #define SI7021_ADDRESS 0x40
 #define CMD_SI7021_HUMIDITY 0xE5
 #define CMD_SI7021_TEMPERATURE 0xE0
-
-#define BMP180_ADDRESS 0x77
-#define CMD_BMP180_PRESSURE 0xF7
 
 int readSensors();
 uint16_t * getHumidity();
