@@ -92,7 +92,7 @@ void bmpDelayMsec(uint32_t delay)
  * it is neccesary to call 'bmp180_get_temperature()' before
  * 'bmp_get_pressure()' for accurate readings.
  *
- * return: air pressure in Pa
+ * return data: air pressure in Pa
  */
 int readBMPSensor(uint8_t address, int32_t *data)
 {
@@ -115,7 +115,7 @@ int readBMPSensor(uint8_t address, int32_t *data)
 
     com_rslt += bmp180_get_temperature(v_uncomp_temp_u16);
 
-    *data = bmp180_get_pressure(v_uncomp_press_u32) / 10;
+    *data = bmp180_get_pressure(v_uncomp_press_u32);
 
     return 0;
 }
